@@ -1,8 +1,4 @@
 
-
-Authored by Liam Niehus-Staab
-date: Feb 1, 2018
-
 # Linear Algebra Matrix Math
 
 This is a class that allows for the creation of matricies and contains some
