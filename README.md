@@ -1,9 +1,10 @@
 
 # Linear Algebra Matrix Math
 
-This is a class that allows for the creation of matricies and contains some
-methods pertinant to typical matrix mathematics, including some basic linear
-algebra methods.
+This project includes a class that allows for the creation of matricies and
+contains some methods pertinant to typical matrix mathematics, including some
+basic linear algebra methods. It also includes a text-based interface for using
+the class's methods.
 
 ## Getting Started
 
