@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from Matrix import *
+import Matrix
 """
 A basic user interface for testing the Matrix class.
-
 
 @author Liam Niehus-Staab
 @since Feb 6, 2018

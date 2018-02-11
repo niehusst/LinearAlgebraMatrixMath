@@ -12,11 +12,11 @@ All methods are built to accomodate real numbers only.
 
 ***implement methods for :
 0. initialize matrix vals    X
-1. determinent,              
+1. determinent,              X
 2. inverse,                  
 3. eigenvalues and vectors,  
 4. matrix multiplication,    
-5. matrix add and subtract   
+5. matrix add and subtract   X
 unique instance vars :     
 1. num rows                  X
 2. num cols                  X
@@ -30,8 +30,10 @@ class Matrix(object):
     desired dimensions of the matrix be given at instantiation
     and initialization to occur at a later date.
     
-    @param numCols - The number of columns the matrix will have
-    @param numRows - The number of rows the matrix will have
+    @param numCols - an int number of columns the Matrix will have.
+    @param numRows - an int number of rows the Matrix will have.
+    @param position - A list of lists. The numeric data 
+                      contained in the Matrix object.
     """
     def __init__(self, numRows, numCols, position=[]):
         self.numCols = numCols
@@ -41,22 +43,25 @@ class Matrix(object):
     #A macro constant required for determinant calculations
     SIGN = 1
     
+    ########## PRIVATE METHODS ##########
     """
     Determines if a matrix is square. 
     
-    @return - a boolean, <true> if self is square, else <false>
+    @return - a boolean, <true> if self has the same number of
+              rows as columns, else <false>.
     """
     def _isSquare(self):
         return (self.numCols == self.numRows)
     
     """
-    Determines if two matricies can be multiplied.
+    Determines if two matricies can be multiplied together.
     
-    @param matrx - a Matrix type object
-    @return - a boolean, <true> if matricies 
+    @param matrx - A Matrix type object.
+    @return - a boolean, <true> if self has same number of 
+              columns as matrx has rows. Else, <false>.
     """
     def _canMulti(self, matrx):
-        return (self.numRows == matrx.numCols) and (self.numCols == matrx.numRows)
+        return (self.numCols == matrx.numRows) 
     
     """
     Determines if two matricies can be arithmatically compared
@@ -72,12 +77,12 @@ class Matrix(object):
     """
     Creates and returns a square matrix that is a piece of the
     larger matrix, self. The new Matrix excludes the first 
-    column, and the specified row.
+    column, and the specified row. A helper for the det method.
     
     @param notRow - An integer that is less than matrx.numRows
                     and indicates which row not to include in result.
-    @return - A square matrix which is smaller by 1 dimension
-              than the original matrix.        
+    @return - A square Matrix object which is smaller by 1 dimension
+              than the original object.        
     """
     def _subMatrix(self, notRow):
         rowCount = 0
@@ -92,14 +97,50 @@ class Matrix(object):
             rowCount += 1
         subM = Matrix(self.numRows-1, self.numCols-1, newMatrix)
         return subM
+    
+    """
+    A method to multiply a scalar, real number with the Matrix
+    object, self.
+    
+    @param operand - a real number
+    @return m - a Matrix type object
+    """
+    def _scalarMulti(self, operand):
+        matrx = []
+        for row in self.position:
+            newRow = []
+            for val in row:
+                newRow.append(val * operand)
+            matrx.append(newRow)
+        return Matrix(self.numRows, self.numCols, matrx)
+    
+    """
+    A method for multiplying two Matrix objects together.
+    
+    @param operand - a Matrix object
+    @return - a Matrix object (the product)
+    """
+    def _matrixMulti(self, operand):
+        matrx = []
+        for row in range(self.numRows):
+            newRow = []
+            for col in range(operand.numCols):
+                val = 0
+                for x in range(self.numCols):
+                    val += self.position[row][x] * operand[col][x]
+                newRow.append(val)
+            matrx.append(newRow)
+        return Matrix(self.numRows, operand.numCols, matrx)
         
+    ########## PUBLIC METHODS ##########
     """
     initMatrix is a method that returns nothing and has the
     side effect of initializing the position instance variable
     of the matrix it is called on. 
+    
     It takes no arguments, and instead prompts the user
-    for the correct number of values (based on numCols and
-    numRows).
+    for the correct number of values (based on self.numCols and
+    self.numRows).
     """
     def initMatrix(self):
         for r in range(self.numRows):
@@ -117,19 +158,77 @@ class Matrix(object):
             print(row)
     
     """
-    det calculates and returns the determinant of the matrix
-    if possible. If not possible, it prints an error message.
+    times, A method to multiply the self with operand. Works
+    with both real (float and int) and Matrix types. 
+    
+    @param operand - Either a real number or a matrix of legal
+                     dimensions.
+    @return - A new Matrix object.
+    @return - An error String in the case of invalid input
+    """
+    def times(self, operand):
+        if(isinstance(operand, int) or isinstance(operand, float)):
+            return self._scalarMulti(operand)
+        elif(isinstance(operand, Matrix)):
+            return self._matrixMulti(operand)
+        else:
+            return "Illegal operand."
+            
+    """
+    plus, A method to add the self with operand.
+    
+    @param operand - A matrix of legal dimensions.
+    @return - A new Matrix object.
+    """
+    def plus(self, operand):
+        if(self._canArith(operand)):
+            matrx = []
+            for row in range(self.numRows):
+                newRow = []
+                for col in range(self.numCols):
+                    newRow.append(self.position[row][col] + operand.position[row][col])
+                matrx.append(newRow)
+            return Matrix(self.numRows, self.numCols, matrx)
+        else:
+            return "Illegal operand."
+        
+    """
+    minus, A method to subtract the operand from self.
+    
+    @param operand - A matrix of legal dimensions.
+    @return - A new Matrix object.
+    """
+    def minus(self, operand):
+        if(self._canArith(operand)):
+            matrx = []
+            for row in range(self.numRows):
+                newRow = []
+                for col in range(self.numCols):
+                    newRow.append(self.position[row][col] - operand.position[row][col])
+                matrx.append(newRow)
+            return Matrix(self.numRows, self.numCols, matrx)
+        else:
+            return "Illegal operand."
+        
+    """
+    det calculates and returns the determinant of the Matrix
+    if possible. If not possible, it returns an error message.
     
     @param sign - Either 1 or -1, determines the sign of the 
                   coeficient multiplier for matricies larger 
                   than 2x2.
+    @return d - The determinant of self, a real number. 
+    @return - if no determinant is possible, a String error 
+              message is returned.
     """
     def det(self, sign):
         global SIGN
         #a guard to ensure that matrix is square and thus has a determinant
         if(not self._isSquare()):
-            print("Given matrix is not square, cannot compute determinant.")
-            return "ERROR"
+            return "Given matrix is not square, cannot compute determinant."
+        #Special case of the 1x1 matrix whose determinant is itself
+        if(self.numRows == 1 and self.numCols == 1):
+            return self
         else:
             d = 0.0
             #The recursive base case
