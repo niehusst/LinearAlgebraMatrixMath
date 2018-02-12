@@ -29,4 +29,5 @@ fun to test my knowledge of Python and Linear Algebra.
 ## Acknowledgments
 
 * The formatting style of this README was borrowed from [Billie Thompson](https://gist.github.com/PurpleBooth/109311bb0361f32d87a2#file-readme-template-md)
+* I refreshed my knowledge on how to compute an inverse using the determinant at [mathisfun.com](https://www.mathsisfun.com/algebra/matrix-inverse-minors-cofactors-adjugate.html)
 * This project was inspired by Professor Jerod Weinman.
