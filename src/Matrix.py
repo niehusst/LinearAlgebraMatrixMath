@@ -1,26 +1,29 @@
 """
-Class that helps with computational linear algebra.
-(Note that this is by no means the most efficient program;
-it uses cofactor expansion (as opposed to elementary 
-operations) to do computations, so it dramatically slows
-down the larger the matrix the methods are performed on.)
-All methods are built to accomodate real numbers only.
-
+This Matrix class helps with computational linear algebra,
+as well as other basic matrix math procedures.
+(Note that this is by no means the most efficient program
+possible; it uses cofactor expansion (as opposed to elementary 
+operations) to do determinant computations, exponentially slowing
+computation in the affected methods for larger matrices.)
+All methods are intended to accomodate real numbers only.
 
 @author Liam Niehus-Staab
 @since Feb 1, 2018
-
+******************************
 ***implement methods for :
 0. initialize matrix vals    X
 1. determinent,              X
-2. inverse,                  
+2. inverse,                  X
 3. eigenvalues and vectors,  
-4. matrix multiplication,    
+4. matrix multiplication,    X
 5. matrix add and subtract   X
-unique instance vars :     
+unique instance vars :       X
 1. num rows                  X
 2. num cols                  X
-((impliment using elementary ops or cofactor expansion?))
+testing:
+1. tested arithmatics        
+2. tested linalg stuff      
+****************************** 
 """
 
 class Matrix(object):
@@ -77,26 +80,27 @@ class Matrix(object):
     """
     Creates and returns a square matrix that is a piece of the
     larger matrix, self. The new Matrix excludes the first 
-    column, and the specified row. A helper for the det method.
+    column, and the specified row. A helper for the det and 
+    inverse methods.
     
-    @param notRow - An integer that is less than matrx.numRows
+    @param notRow - An integer that is less than self.numRows
                     and indicates which row not to include in result.
+    @param notCol - An integer that is less than self.numCols
+                    and indicates which column not to include in
+                    the result.
     @return - A square Matrix object which is smaller by 1 dimension
               than the original object.        
     """
-    def _subMatrix(self, notRow):
-        rowCount = 0
+    def _subMatrix(self, notRow, notCol):
         newMatrix = []
-        for row in self.position:
+        for row in range(self.position):
             newRow = []
-            if(rowCount != notRow):
-                for x in row:
-                    if(x != 0):
-                        newRow.append(x)
+            if(row != notRow):
+                for col in range(self.numCols):
+                    if(col != notCol):
+                        newRow.append(self.position[row][col])
             newMatrix.append(newRow)
-            rowCount += 1
-        subM = Matrix(self.numRows-1, self.numCols-1, newMatrix)
-        return subM
+        return Matrix(self.numRows-1, self.numCols-1, newMatrix)
     
     """
     A method to multiply a scalar, real number with the Matrix
@@ -131,6 +135,56 @@ class Matrix(object):
                 newRow.append(val)
             matrx.append(newRow)
         return Matrix(self.numRows, operand.numCols, matrx)
+    
+    """
+    A method for creaing a matrix of CoFactors from the
+    Matrix object, self. This is done by making the matrix
+    of minors and signing each element as it put into the
+    matrix. A helper for the inverse method.
+    
+    @param sign - the int value, 1. Used for signing the 
+                  elements as the matrix is created.
+    @return - a Matrix object, the matrix of minors
+    """
+    def _cofactor(self, sign):
+        matrx = []
+        for row in range(self.numRows):
+            newRow = []
+            for col in range(self.numCols):
+                newRow.append(sign * (self._subMatrix(row, col)).det())
+                sign *= -1
+            matrx.append(newRow)
+        return Matrix(self.numRows-1, self.numCols-1, matrx)
+    
+    """
+    A method to return the transposition of self.
+    A helper for the inverse method.
+    
+    @return - a Matrix object, the transpose of self.
+    """
+    def _transpose(self):
+        matrx = []
+        for row in range(self.numRows):
+            newRow = []
+            for col in range(self.numCols):
+                newRow.append(self.position[col][row])
+            matrx.append(newRow)
+        return Matrix(self.numRows, self.numCols, matrx)
+        
+    """
+    The kernel of the public wrapper method inverse.
+    This method handles the actual computation of the
+    matrix inverse.
+    
+    @param d - the determinant of the Matrix object, self.
+    @return - a Matrix object, the inverse of self.
+    """
+    def _inverseKernel(self, d):
+        #Special case of the 1x1 matrix
+        if(self.numRows == 1 and self.numCols == 1):
+            return Matrix(1, 1, (1.0/self.position[0][0]))
+        else:
+            return self._cofactor()._transpose().times(1.0/d)
         
     ########## PUBLIC METHODS ##########
     """
@@ -214,15 +268,18 @@ class Matrix(object):
     det calculates and returns the determinant of the Matrix
     if possible. If not possible, it returns an error message.
     
-    @param sign - Either 1 or -1, determines the sign of the 
-                  coeficient multiplier for matricies larger 
-                  than 2x2.
+    PRECONDITION - only Matrix objects with equal fields
+                   numRows and numCols have determinants.
+                   If this precondition isn't met, an error
+                   String will be returned.
+    
     @return d - The determinant of self, a real number. 
     @return - if no determinant is possible, a String error 
               message is returned.
     """
-    def det(self, sign):
+    def det(self):
         global SIGN
+        sign = SIGN
         #a guard to ensure that matrix is square and thus has a determinant
         if(not self._isSquare()):
             return "Given matrix is not square, cannot compute determinant."
@@ -237,10 +294,42 @@ class Matrix(object):
             else:
                 for row in range(self.numRows):
                     coef = sign * self.position[row][0]
-                    d += coef * (self._subMatrix(SIGN)).det(SIGN)
+                    d += coef * (self._subMatrix(SIGN,row,0)).det()
                     sign *= -1
                 return d
     
+    """
+    A method to calculate and return the inverse of the Matrix object,
+    self, by finding its adjugate, and then multiplying it by 
+    the inverse of the determinant. THIS IS A VERY COMPUTATIONALLY
+    COSTLY METHOD.
+    
+    PRECONDITION - only Matrix objects with equal fields
+                   numRows and numCols have determinants (and
+                   thus inverses), and only matricies with non-zero
+                   determinants have inverses.
+                   If this precondition isn't met, an error
+                   String will be returned.
+
+    @return - a Matrix object, the inverse matrix of self.
+    @return - a String, reports the type of error that was 
+              encountered (non-square matrix or self.det() == 0)
+    """
+    def inverse(self):
+        global SIGN
+        #guards against illegal matrix input
+        if(not self._isSquare()):
+            return "Illegal matrix dimensions, self isn't square."
+        #store the value of the determinant to save costly computation
+        determinant = self.det()
+        if(determinant == 0):
+            return "Determinant of 0, no inverse."
+        else:
+            return self._inverseKernel(determinant)
+        
+            
+                
+        
     
     
     
