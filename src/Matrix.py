@@ -5,25 +5,39 @@ as well as other basic matrix math procedures.
 possible; it uses cofactor expansion (as opposed to elementary 
 operations) to do determinant computations, exponentially slowing
 computation in the affected methods for larger matrices.)
-All methods are intended to accomodate real numbers only.
+All methods are intended to accomodate only real numbers.
+
+Required fields for instantiation are numRows and numCols.
+The position field is optional.
 
 @author Liam Niehus-Staab
 @since Feb 1, 2018
-******************************
-***implement methods for :
-0. initialize matrix vals    X
-1. determinent,              X
-2. inverse,                  X
-3. eigenvalues and vectors,  
-4. matrix multiplication,    X
-5. matrix add and subtract   X
-unique instance vars :       X
-1. num rows                  X
-2. num cols                  X
-testing:
-1. tested arithmatics        
-2. tested linalg stuff      
-****************************** 
+*******************************
+***fields of Matrix instance***
+* 0. numRows                  *
+* 1. numCols                  *
+* 2. position                 *
+**public Matrix class methods**
+* 0. initMatrix               *
+* 1. det                      *
+* 2. inverse                  *
+* 3. eigenvalues and vectors, - 
+* 4. times                    *
+* 5. plus                     *
+* 6. printM                   *
+* 7. minus                    *
+* 8. RANK NULLITY?????        -
+**private Matrix class methods*
+* 0. _isSquare                *
+* 1. _canMulti                *
+* 2. _canArith                *
+* 3. _subMatrix               *
+* 4. _scalarMulti             *
+* 5. _matrixMulti             *
+* 6. _cofactor                *
+* 7. _transpose               *
+* 8. _inverseKernel           *
+*******************************
 """
 
 class Matrix(object):
