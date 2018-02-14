@@ -54,15 +54,12 @@ class Matrix(object):
     @param numCols - an int number of columns the Matrix will have.
     @param numRows - an int number of rows the Matrix will have.
     @param position - A list of lists. The numeric data 
-                      contained in the Matrix object.
+                      contained in the Matrix object. (optional)
     """
     def __init__(self, numRows, numCols, position=[]):
         self.numCols = numCols
         self.numRows = numRows
         self.position = position
-    
-    #A macro constant required for determinant calculations
-    SIGN = 1
     
     ########## PRIVATE METHODS ##########
     """
@@ -111,13 +108,13 @@ class Matrix(object):
     """
     def _subMatrix(self, notRow, notCol):
         newMatrix = []
-        for row in range(self.position):
+        for row in range(self.numRows):
             newRow = []
             if(row != notRow):
                 for col in range(self.numCols):
                     if(col != notCol):
                         newRow.append(self.position[row][col])
-            newMatrix.append(newRow)
+                newMatrix.append(newRow)
         return Matrix(self.numRows-1, self.numCols-1, newMatrix)
     
     """
@@ -149,7 +146,7 @@ class Matrix(object):
             for col in range(operand.numCols):
                 val = 0
                 for x in range(self.numCols):
-                    val += self.position[row][x] * operand[col][x]
+                    val += self.position[row][x] * operand.position[x][col]
                 newRow.append(val)
             matrx.append(newRow)
         return Matrix(self.numRows, operand.numCols, matrx)
@@ -160,11 +157,10 @@ class Matrix(object):
     of minors and signing each element as it put into the
     matrix. A helper for the inverse method.
     
-    @param sign - the int value, 1. Used for signing the 
-                  elements as the matrix is created.
-    @return - a Matrix object, the matrix of minors
+    @return - a Matrix object, the matrix of cofactors
     """
-    def _cofactor(self, sign):
+    def _cofactor(self):
+        sign = 1
         matrx = []
         for row in range(self.numRows):
             newRow = []
@@ -172,7 +168,7 @@ class Matrix(object):
                 newRow.append(sign * (self._subMatrix(row, col)).det())
                 sign *= -1
             matrx.append(newRow)
-        return Matrix(self.numRows-1, self.numCols-1, matrx)
+        return Matrix(self.numRows, self.numCols, matrx)
     
     """
     A method to return the transposition of self.
@@ -256,8 +252,7 @@ class Matrix(object):
     
     """
     def _stringDet(self):
-        global SIGN
-        sign = SIGN
+        sign = 1
         #a guard to ensure that matrix is square and thus has a determinant
         if(not self._isSquare()):
             return "Given matrix is not square, cannot compute determinant."
@@ -272,7 +267,7 @@ class Matrix(object):
             else:
                 for row in range(self.numRows):
                     coef = self._stringTimes(str(sign), self.position[row][0])
-                    d += self._stringTimes(coef, (self._subMatrix(SIGN,row,0))._stringDet())
+                    d += self._stringTimes(coef, (self._subMatrix(row,0))._stringDet())
                     sign *= -1
                 return d
     
@@ -368,8 +363,7 @@ class Matrix(object):
               message is returned.
     """
     def det(self):
-        global SIGN
-        sign = SIGN
+        sign = 1
         #a guard to ensure that matrix is square and thus has a determinant
         if(not self._isSquare()):
             return "Given matrix is not square, cannot compute determinant."
@@ -384,7 +378,7 @@ class Matrix(object):
             else:
                 for row in range(self.numRows):
                     coef = sign * self.position[row][0]
-                    d += coef * (self._subMatrix(SIGN,row,0)).det()
+                    d += coef * (self._subMatrix(row,0)).det()
                     sign *= -1
                 return d
     
@@ -446,12 +440,22 @@ class Matrix(object):
     @return - a String, in the event that 
     """
     def diagonalize(self):
-        
+        return 0
     
     
-    
-    
-    
+################## testing #####################
+m = Matrix(3,3, [[1,2,3],[3,2,1],[5,2,1]])
+Id = Matrix(5,5, [[1,0,0,0,0],[0,1,0,0,0],[0,0,1,0,0], [0,0,0,1,0], [0,0,0,0,1]])
+m.printM()    
+print(m.det())
+i = m.inverse()
+print("invers is")
+i.printM()
+print()
+print("inverse times m")
+print()
+#print("rws = " + str(i.numRows) + " cols = " + str(i.numCols))
+m.times(i).printM()
     
     
     
