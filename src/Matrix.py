@@ -41,6 +41,9 @@ The position field is optional.
 * 6. _cofactor                *
 * 7. _transpose               *
 * 8. _inverseKernel           *
+* 9. _lambdaMatrix            *
+* 10. _stringDet              *
+* 11. _stringTimes            *
 *******************************
 """
 
@@ -218,7 +221,7 @@ class Matrix(object):
                     newRow.append(str(self.position[row][col]) + " - y")
                 else:
                     newRow.append(str(self.position[row][col]))
-                matrx.append(newRow)
+            matrx.append(newRow)
         return Matrix(self.numRows, self.numCols, matrx)
     
     """
@@ -233,7 +236,7 @@ class Matrix(object):
               seperated by "*".
     """
     def _stringTimes(self, v1, v2):
-        return v1 + " * " + v2
+        return "(" + v1 + ") * (" + v2 + ")"
     
     """
     _stringDet converts and concatinates all of the calculations 
@@ -263,15 +266,18 @@ class Matrix(object):
             d = ""
             #The recursive base case
             if(self.numRows == 2 and self.numCols == 2):
-                return (self._stringTimes(self.position[0][0], self.position[1][1]) - self._stringTimes(self.position[0][1], self.position[1][0]))
+                
+                return (self._stringTimes(self.position[0][0], self.position[1][1]) 
+                        + " - " + self._stringTimes(self.position[0][1], self.position[1][0]))
             else:
                 for row in range(self.numRows):
                     coef = self._stringTimes(str(sign), self.position[row][0])
-                    d += self._stringTimes(coef, (self._subMatrix(row,0))._stringDet())
+                    d += self._stringTimes(coef, (self._subMatrix(row,0))._stringDet()) + " + "
                     sign *= -1
+                d += "0"
                 return d
     
-    ########## PUBLIC METHODS ##########
+    ########## PUBLIC METHODS ###########
     """
     initMatrix is a method that returns nothing and has the
     side effect of initializing the position instance variable
@@ -308,7 +314,7 @@ class Matrix(object):
     def times(self, operand):
         if(isinstance(operand, int) or isinstance(operand, float)):
             return self._scalarMulti(operand)
-        elif(isinstance(operand, Matrix)):
+        elif(isinstance(operand, Matrix) and self._canMulti(operand)):
             return self._matrixMulti(operand)
         else:
             return "Illegal operand."
@@ -444,11 +450,13 @@ class Matrix(object):
     
     
 ################## testing #####################
-m = Matrix(3,3, [[1,2,3],[3,2,1],[5,2,1]])
+m = Matrix(3,3, [[2,0,0],[1,2,1],[-1,0,1]])
 Id = Matrix(5,5, [[1,0,0,0,0],[0,1,0,0,0],[0,0,1,0,0], [0,0,0,1,0], [0,0,0,0,1]])
 m.printM()    
 print(m.det())
 i = m.inverse()
+print("multi?")
+m.times(Id).printM()
 print("invers is")
 i.printM()
 print()
@@ -456,6 +464,7 @@ print("inverse times m")
 print()
 #print("rws = " + str(i.numRows) + " cols = " + str(i.numCols))
 m.times(i).printM()
-    
+print("eigens are ")
+print(m.eigenVals())
     
     
