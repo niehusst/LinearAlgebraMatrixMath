@@ -170,6 +170,7 @@ class Matrix(object):
             for col in range(self.numCols):
                 newRow.append(sign * (self._subMatrix(row, col)).det())
                 sign *= -1
+            sign *= -1
             matrx.append(newRow)
         return Matrix(self.numRows, self.numCols, matrx)
     
@@ -191,17 +192,21 @@ class Matrix(object):
     """
     The kernel of the public wrapper method inverse.
     This method handles the actual computation of the
-    matrix inverse.
+    matrix inverse by finding the cofactor of the matrix
+    of minors, and then transposing it; resulting in the
+    adjugate matrix. And the inverse is calculating by 
+    mulitplying the adjugate by the inverse determinant.
     
-    @param d - the determinant of the Matrix object, self.
+    @param determinant - a float, the determinant of self.
     @return - a Matrix object, the inverse of self.
     """
-    def _inverseKernel(self, d):
+    def _inverseKernel(self, determinant):
         #Special case of the 1x1 matrix
         if(self.numRows == 1 and self.numCols == 1):
-            return Matrix(1, 1, (1.0/self.position[0][0]))
+            return Matrix(1, 1, [[1.0/self.position[0][0]]])
         else:
-            return self._cofactor()._transpose().times(1.0/d)
+            adjugate = self._cofactor()._transpose()
+            return adjugate.times(1.0/determinant)
         
     """
     Calculates the matrix that results from (A - (lambda)I)
@@ -261,7 +266,7 @@ class Matrix(object):
             return "Given matrix is not square, cannot compute determinant."
         #Special case of the 1x1 matrix whose determinant is itself
         if(self.numRows == 1 and self.numCols == 1):
-            return self
+            return Matrix(1,1,[[str(self.posiiton[0][0])]])
         else:
             d = ""
             #The recursive base case
@@ -380,7 +385,8 @@ class Matrix(object):
             d = 0.0
             #The recursive base case
             if(self.numRows == 2 and self.numCols == 2):
-                return (self.position[0][0] * self.position[1][1] - self.position[0][1] * self.position[1][0])
+                return (self.position[0][0] * self.position[1][1] 
+                        - self.position[0][1] * self.position[1][0])
             else:
                 for row in range(self.numRows):
                     coef = sign * self.position[row][0]
@@ -418,10 +424,12 @@ class Matrix(object):
         
     """
     This method finds the eigenvalues of a Matrix object,
-    if they exist. 
+    if they exist. Some eigenvalues may be complex, this
+    method returns only the real portion of those complex 
+    numbers.
     
-    @return - a list, contains the eigenvales of the matrix as
-              floats.
+    @return - a list, contains the real eigenvales of the 
+              matrix as floats.
     @return - a String, in the event that there are no eigenvalues
     """
     def eigenVals(self):
@@ -431,9 +439,12 @@ class Matrix(object):
         else:
             charPoly = self._lambdaMatrix()._stringDet()
             eigens = solve(charPoly)
-            #loop evaluates any non-float expressions returned by solve
+            #evaluates any non-float expressions returned by solve
+            #if it is evaluated to a complex number, selects only the real part
             for i in range(len(eigens)):
-                eigens[i] = eigens[i].evalf()
+                eigens[i] = (eigens[i].evalf())
+                #if(isinstance(eigens[i], complex)):#############################
+                 #   eigens[i] = eigens[i].real #################################
             return eigens
                 
     """
@@ -450,8 +461,8 @@ class Matrix(object):
     
     
 ################## testing #####################
-m = Matrix(3,3, [[2,0,0],[1,2,1],[-1,0,1]])
-Id = Matrix(5,5, [[1,0,0,0,0],[0,1,0,0,0],[0,0,1,0,0], [0,0,0,1,0], [0,0,0,0,1]])
+m = Matrix(4,4, [[2,0,0,-1],[1,2,1,0],[-1,0,1,2],[0,2,1,1]])
+Id = Matrix(4,4, [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]])
 m.printM()    
 print(m.det())
 i = m.inverse()
@@ -462,9 +473,10 @@ i.printM()
 print()
 print("inverse times m")
 print()
-#print("rws = " + str(i.numRows) + " cols = " + str(i.numCols))
 m.times(i).printM()
 print("eigens are ")
 print(m.eigenVals())
-    
-    
+print("m + Id")
+m.plus(Id).printM()
+print("m - ID")
+m.minus(Id).printM()

@@ -8,7 +8,7 @@ Created on Mon Feb 12 23:41:14 2018
 @author: Liam2
 """
 #y = Symbol('y')
-x = str(2*y**2 + 4*y - 1)
+x = str(2*y**3 - 10*y**2 + 4*y - 1)
 lst = solve(x, y)
 def setter(l):
     for i in range(len(l)):
@@ -16,4 +16,8 @@ def setter(l):
     return l
 lst = setter(lst)
 print(lst)
+c = complex(2,1)
+print(c)
+
+print(lst[0].real)
 #m = Matrix(2,2)
