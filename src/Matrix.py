@@ -1,3 +1,5 @@
+from sympy import solve, evalf
+
 """
 This Matrix class helps with computational linear algebra,
 as well as other basic matrix math procedures.
@@ -13,7 +15,7 @@ The position field is optional.
 @author Liam Niehus-Staab
 @since Feb 1, 2018
 *******************************
-***fields of Matrix instance***
+***Fields of Matrix instance***
 * 0. numRows                  *
 * 1. numCols                  *
 * 2. position                 *
@@ -21,12 +23,14 @@ The position field is optional.
 * 0. initMatrix               *
 * 1. det                      *
 * 2. inverse                  *
-* 3. eigenvalues and vectors, - 
+* 3. eigenVals                *
 * 4. times                    *
 * 5. plus                     *
-* 6. printM                   *
-* 7. minus                    *
-* 8. RANK NULLITY?????        -
+* 6. minus                    *
+* 7. printM                   *
+* 8. eigenvectors?????        -
+* 9. diagonalize              -
+* 10. expon                   -
 **private Matrix class methods*
 * 0. _isSquare                *
 * 1. _canMulti                *
@@ -200,6 +204,78 @@ class Matrix(object):
         else:
             return self._cofactor()._transpose().times(1.0/d)
         
+    """
+    Calculates the matrix that results from (A - (lambda)I)
+    where I is the identity matrix and lambda represents
+    an eigenvalue. Uses Strings as elements to facilitate
+    use with sympy 'solve' function.
+    
+    @return - a Matrix object, different from the usual Matrix
+              in that its elements are all strings.
+    """
+    def _lambdaMatrix(self):
+        matrx = []
+        for row in range(self.numRows):
+            newRow = []
+            for col in range(self.numCols):
+                if(row == col):
+                    newRow.append(str(self.position[row][col]) + " - y")
+                else:
+                    newRow.append(str(self.position[row][col]))
+                matrx.append(newRow)
+        return Matrix(self.numRows, self.numCols, matrx)
+    
+    """
+    _stringTimes is a function that takes two Strings and
+    concatanates them with a '*' character in between.
+    
+    @param v1 - A String, should represent a real number, or
+                a combination of real numbers and symbols.
+    @param v2 - A String, should represent a real number, or
+                a combination of real numbers and symbols.            
+    @return - a String, the concatination of v1 and v2 
+              seperated by "*".
+    """
+    def _stringTimes(self, v1, v2):
+        return v1 + " * " + v2
+    
+    """
+    _stringDet converts and concatinates all of the calculations 
+    of the determinant into a String and returns that String of  
+    calculations if possible. If not possible, it returns an 
+    error message.
+    
+    PRECONDITION - only Matrix objects with equal fields
+                   numRows and numCols have determinants.
+                   If this precondition isn't met, an error
+                   String will be returned.
+    
+    @return d - a String, the determinant of self. 
+    @return - if no determinant is possible, a String error 
+              message is returned.
+    
+    """
+    def _stringDet(self):
+        global SIGN
+        sign = SIGN
+        #a guard to ensure that matrix is square and thus has a determinant
+        if(not self._isSquare()):
+            return "Given matrix is not square, cannot compute determinant."
+        #Special case of the 1x1 matrix whose determinant is itself
+        if(self.numRows == 1 and self.numCols == 1):
+            return self
+        else:
+            d = ""
+            #The recursive base case
+            if(self.numRows == 2 and self.numCols == 2):
+                return (self._stringTimes(self.position[0][0], self.position[1][1]) - self._stringTimes(self.position[0][1], self.position[1][0]))
+            else:
+                for row in range(self.numRows):
+                    coef = self._stringTimes(str(sign), self.position[row][0])
+                    d += self._stringTimes(coef, (self._subMatrix(SIGN,row,0))._stringDet())
+                    sign *= -1
+                return d
+    
     ########## PUBLIC METHODS ##########
     """
     initMatrix is a method that returns nothing and has the
@@ -330,7 +406,6 @@ class Matrix(object):
               encountered (non-square matrix or self.det() == 0)
     """
     def inverse(self):
-        global SIGN
         #guards against illegal matrix input
         if(not self._isSquare()):
             return "Illegal matrix dimensions, self isn't square."
@@ -341,10 +416,37 @@ class Matrix(object):
         else:
             return self._inverseKernel(determinant)
         
-            
-                
-        
+    """
+    This method finds the eigenvalues of a Matrix object,
+    if they exist. 
     
+    @return - a list, contains the eigenvales of the matrix as
+              floats.
+    @return - a String, in the event that there are no eigenvalues
+    """
+    def eigenVals(self):
+        #y = Symbol('y') #give back to lambdaMatix
+        if(not self._isSquare):
+            return "Eigenvalues don't exist for non-square matrix."
+        else:
+            charPoly = self._lambdaMatrix()._stringDet()
+            eigens = solve(charPoly)
+            #loop evaluates any non-float expressions returned by solve
+            for i in range(len(eigens)):
+                eigens[i] = eigens[i].evalf()
+            return eigens
+                
+    """
+    diagonalize returns the diagonal Matrix of self, if a 
+    diagonal exists. [D] = [P^-1][A][P]
+    
+    **helpers
+    #linindep   (checks if is linearly independent) //for diag
+    @return - a Matrix object, the diagonal of self.
+    @return - a String, in the event that 
+    """
+    def diagonalize(self):
+        
     
     
     
