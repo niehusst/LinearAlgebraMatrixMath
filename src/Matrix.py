@@ -1,4 +1,5 @@
 from sympy import solve, evalf
+from re import match
 
 """
 This Matrix class helps with computational linear algebra,
@@ -439,14 +440,24 @@ class Matrix(object):
         else:
             charPoly = self._lambdaMatrix()._stringDet()
             eigens = solve(charPoly)
-            #evaluates any non-float expressions returned by solve
+            #the following evaluates any non-float expressions returned by solve
             #if it is evaluated to a complex number, selects only the real part
             for i in range(len(eigens)):
                 eigens[i] = (eigens[i].evalf())
-                #if(isinstance(eigens[i], complex)):#############################
-                 #   eigens[i] = eigens[i].real #################################
+                if(not isinstance(eigens[i], float)):
+                    eigens[i] = float(match(r"[0-9]+\.[0-9]+", str(eigens[i])).group(0)) 
             return eigens
-                
+    
+    """
+    Finds the eigenvectors of the Matrix object, self.
+    
+    @return - a list of lists, the nested lists contain the
+              eigenvectors.
+    """
+    def eigenVecs(self):
+        
+        return 
+            
     """
     diagonalize returns the diagonal Matrix of self, if a 
     diagonal exists. [D] = [P^-1][A][P]
