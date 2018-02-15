@@ -29,9 +29,6 @@ The position field is optional.
 * 5. plus                     *
 * 6. minus                    *
 * 7. printM                   *
-* 8. eigenvectors?????        -
-* 9. diagonalize              -
-* 10. expon                   -
 **private Matrix class methods*
 * 0. _isSquare                *
 * 1. _canMulti                *
@@ -297,7 +294,7 @@ class Matrix(object):
         for r in range(self.numRows):
             layer = []
             for c in range(self.numCols):
-              layer.append(float(input("Input value for [" + r + "," + c +"] :")))
+              layer.append(float(input("Input value for [" + str(r) + "," + str(c) +"] :")))
             self.position.append(layer)
                       
     """
@@ -448,46 +445,6 @@ class Matrix(object):
                     eigens[i] = float(match(r"[0-9]+\.[0-9]+", str(eigens[i])).group(0)) 
             return eigens
     
-    """
-    Finds the eigenvectors of the Matrix object, self.
-    
-    @return - a list of lists, the nested lists contain the
-              eigenvectors.
-    """
-    def eigenVecs(self):
-        
-        return 
-            
-    """
-    diagonalize returns the diagonal Matrix of self, if a 
-    diagonal exists. [D] = [P^-1][A][P]
-    
-    **helpers
-    #linindep   (checks if is linearly independent) //for diag
-    @return - a Matrix object, the diagonal of self.
-    @return - a String, in the event that 
-    """
-    def diagonalize(self):
-        return 0
+
     
     
-################## testing #####################
-m = Matrix(4,4, [[2,0,0,-1],[1,2,1,0],[-1,0,1,2],[0,2,1,1]])
-Id = Matrix(4,4, [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]])
-m.printM()    
-print(m.det())
-i = m.inverse()
-print("multi?")
-m.times(Id).printM()
-print("invers is")
-i.printM()
-print()
-print("inverse times m")
-print()
-m.times(i).printM()
-print("eigens are ")
-print(m.eigenVals())
-print("m + Id")
-m.plus(Id).printM()
-print("m - ID")
-m.minus(Id).printM()
