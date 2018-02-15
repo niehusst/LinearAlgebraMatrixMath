@@ -386,7 +386,7 @@ class Matrix(object):
             return "Given matrix is not square, cannot compute determinant."
         #Special case of the 1x1 matrix whose determinant is itself
         if(self.numRows == 1 and self.numCols == 1):
-            return self
+            return self.position[0][0]
         else:
             d = 0.0
             #The recursive base case
