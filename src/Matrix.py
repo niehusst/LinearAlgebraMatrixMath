@@ -291,11 +291,14 @@ class Matrix(object):
     self.numRows).
     """
     def initMatrix(self):
+        matrx = []
         for r in range(self.numRows):
-            layer = []
+            newRow = []
             for c in range(self.numCols):
-              layer.append(float(input("Input value for [" + str(r) + "," + str(c) +"] :")))
-            self.position.append(layer)
+              newRow.append((float(input("Input value for ["
+                           + str(r) + "," + str(c) +"]: "))))
+            matrx.append(newRow)
+        self.position = matrx
                       
     """
     A function to print a Matrix type object in a more

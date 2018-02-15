@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from Matrix import *
+from math import factorial
 """
 A basic, text-based user-friendly interface for using
 the Matrix class. Only the public methods of the Matrix
@@ -13,15 +14,17 @@ class are accessible through this interface.
 print("Welcome to the Matrix class user interface!")
 print("(Type \"help\" to see your commmand options)")
 
+#basic starting matrix values
 m = Matrix(2, 2, [[1,0],[0,1]])
 n = Matrix(2, 2, [[1,2],[3,4]])
-
            
-while(True): #break out with break
+while(True): 
+
     cmd = input("Command? ")
+
     if(cmd == "help"):
         print("Possible commands are:\n"
-              "\t init        - inittialize matrix m or n\n"  
+              "\t init        - initialize matrix m or n\n"  
               "\t dimensions  - change dimensions of m or n\n"
               "\t det         - find the determinant of m\n"
               "\t inverse     - find the inverse of matrix m\n"
@@ -32,6 +35,7 @@ while(True): #break out with break
               "\t print       - print matrix m\n"
               "\t help        - get list of commands\n"
               "\t quit        - exit this program\n")
+
     elif(cmd == "init"):
         while(True):
             cmd2 = input("Which matrix do you want to init? (m/n) ")
@@ -43,33 +47,65 @@ while(True): #break out with break
                 break
             else:
                 print("Input did not match one of the possible options. Please try again.")
+
     elif(cmd == "dimensions"):
         while(True):
             cmd2 = input("Dimensions of which matrix would you like to change? (m/n) ")
             if(cmd2 == "m"):
                 m.numRows = int(input("How many rows in matrix m? (must be an int) "))
                 m.numCols = int(input("How many columns in matrix m? (must be an int) "))
+                print("Please initialize your new matrix.")
+                m.initMatrix()
                 break
             if(cmd2 == "n"):
                 n.numRows = int(input("How many rows in matrix n? (must be an int) "))
                 n.numCols = int(input("How many columns in matrix n? (must be an int) "))
+                print("Please initialize your new matrix.")
+                n.initMatrix()
                 break
             else:
                 print("Input did not match one of the possible options. Please try again.")
+
     elif(cmd == "det"):
-        print("Determinant of m is " + str(m.det()))
+        
+        print("Determinant of m is ")
+        if(m.numRows == m.numCols and m.numRows > 9):
+            print("WARNING: program may take approximately " + str(0.0000036 * factorial(m.numRows)) + " seconds to run.")
+            ans = input("Do you want to continune? (y/n) ")
+            if(ans == "y"):
+                print(m.det())
+        else:
+            print(m.det())
+
     elif(cmd == "inverse"):
         print("Inverse of m is ")
-        m.inverse().printM()
+        if(m.numRows == m.numCols and m.numRows > 9):
+            print("WARNING: program may take approximately " + str(0.000036 * factorial(m.numRows)) + " seconds to run.")
+            ans = input("Do you want to continune? (y/n) ")
+            if(ans == "y"):
+                try:
+                    m.inverse().printM()
+                except AttributeError:
+                    print("No inverse possible.")
+        else:
+            try:
+                m.inverse().printM()
+            except AttributeError:
+                    print("No inverse possible.")
+        
     elif(cmd == "eigenvalues"):
         print("The real eigenvalues of m are ")
         print(m.eigenVals())
+ 
     elif(cmd == "times"):
         while(True):
             cmd2 = input("Multiply m by n, or by scalar? (n/scalar) ")
             if(cmd2 == "n"):
                 print("m times n = ")
-                m.times(n).printM()
+                try:
+                    m.times(n).printM()
+                except AttributeError:
+                    print("Matrices not compatible, " + m.times(n))
                 break
             if(cmd2 == "scalar"):
                 x = int(input("Input scalar (must be a real number) "))
@@ -77,17 +113,19 @@ while(True): #break out with break
                 break
             else:
                 print("Input did not match one of the possible options. Please try again.")
+
     elif(cmd == "minus"):
         print("m minus n is")
-        #try:
-        m.minus(n).printM()
-        #catch:
-            
+        try:
+            m.minus(n).printM()
+        except AttributeError:
+            print(m.minus(n))
     elif(cmd == "plus"):
         print("m plus n is")
-        #try
-        m.plus(n).printM()
-        #catch:
+        try:
+            m.plus(n).printM()
+        except AttributeError:
+            print(m.plus(n))
     elif(cmd == "print"):
         while(True):
             cmd2 = input("Which matrix would you like to print? (m/n) ")
@@ -101,8 +139,10 @@ while(True): #break out with break
                 break
             else:
                 print("Input did not match one of the possible options. Please try again.")
+                
     elif(cmd == "quit"):
         print("Exiting program.")
         break
-    else:#defaualt case
+    
+    else:#invalid input case
         print("Input did not match one of the possible options. Please try again.")
