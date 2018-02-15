@@ -101,7 +101,7 @@ while(True):
                     print("Not possible, matrix not square or has a determinant of 0.")
         
     elif(cmd == "eigenvalues"):
-        print("The real eigenvalues of m are ")
+        print("The eigenvalues of m are ")
         if(m.numRows == m.numCols and m.numRows >= 7):
             print("WARNING: program may take approximately " + str(0.0019 * factorial(m.numRows)) + " seconds to run.")
             ans = input("Do you want to continune? (y/n) ")
