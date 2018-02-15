@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 from sympy import solve, evalf
 from re import match
 
@@ -6,8 +8,11 @@ This Matrix class helps with computational linear algebra,
 as well as other basic matrix math procedures.
 (Note that this is by no means the most efficient program
 possible; it uses cofactor expansion (as opposed to elementary 
-operations) to do determinant computations, exponentially slowing
-computation in the affected methods for larger matrices.)
+operations) to do determinant computations, slowing
+computation in the affected methods for larger matrices by 
+a factor of O(n!). While these methods function for matrices
+of any size, they unsatifactory runtimes for matricies 
+larger than 9x9.)
 All methods are intended to accomodate only real numbers.
 
 Required fields for instantiation are numRows and numCols.
@@ -323,7 +328,7 @@ class Matrix(object):
         elif(isinstance(operand, Matrix) and self._canMulti(operand)):
             return self._matrixMulti(operand)
         else:
-            return "Illegal operand."
+            return "Illegal operand error."
             
     """
     plus, A method to add the self with operand.
@@ -341,7 +346,7 @@ class Matrix(object):
                 matrx.append(newRow)
             return Matrix(self.numRows, self.numCols, matrx)
         else:
-            return "Illegal operand."
+            return "Illegal operand error."
         
     """
     minus, A method to subtract the operand from self.
@@ -359,7 +364,7 @@ class Matrix(object):
                 matrx.append(newRow)
             return Matrix(self.numRows, self.numCols, matrx)
         else:
-            return "Illegal operand."
+            return "Illegal operand error."
         
     """
     det calculates and returns the determinant of the Matrix
@@ -430,7 +435,7 @@ class Matrix(object):
     numbers.
     
     @return - a list, contains the real eigenvales of the 
-              matrix as floats.
+              matrix as floats, or complex numbers.
     @return - a String, in the event that there are no eigenvalues
     """
     def eigenVals(self):
@@ -440,12 +445,6 @@ class Matrix(object):
         else:
             charPoly = self._lambdaMatrix()._stringDet()
             eigens = solve(charPoly)
-            #the following evaluates any non-float expressions returned by solve
-            #if it is evaluated to a complex number, selects only the real part
-            for i in range(len(eigens)):
-                eigens[i] = (eigens[i].evalf())
-                if(not isinstance(eigens[i], float)):
-                    eigens[i] = float(match(r"[0-9]+\.[0-9]+", str(eigens[i])).group(0)) 
             return eigens
     
 

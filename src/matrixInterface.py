@@ -6,6 +6,9 @@ from math import factorial
 A basic, text-based user-friendly interface for using
 the Matrix class. Only the public methods of the Matrix
 class are accessible through this interface.
+For matricies with more than 8 columns and rows, there
+is a second prompt for computationally heavy methods that 
+informs the user of an approximate runtime estimation.
 
 @author Liam Niehus-Staab
 @since Feb 6, 2018
@@ -17,7 +20,11 @@ print("(Type \"help\" to see your commmand options)")
 #basic starting matrix values
 m = Matrix(2, 2, [[1,0],[0,1]])
 n = Matrix(2, 2, [[1,2],[3,4]])
-           
+
+"""
+The following loop contains cascading if statements
+to interpret user commands.
+"""         
 while(True): 
 
     cmd = input("Command? ")
@@ -69,7 +76,7 @@ while(True):
     elif(cmd == "det"):
         
         print("Determinant of m is ")
-        if(m.numRows == m.numCols and m.numRows > 9):
+        if(m.numRows == m.numCols and m.numRows >= 9):
             print("WARNING: program may take approximately " + str(0.0000036 * factorial(m.numRows)) + " seconds to run.")
             ans = input("Do you want to continune? (y/n) ")
             if(ans == "y"):
@@ -79,23 +86,29 @@ while(True):
 
     elif(cmd == "inverse"):
         print("Inverse of m is ")
-        if(m.numRows == m.numCols and m.numRows > 9):
+        if(m.numRows == m.numCols and m.numRows >= 9):
             print("WARNING: program may take approximately " + str(0.000036 * factorial(m.numRows)) + " seconds to run.")
             ans = input("Do you want to continune? (y/n) ")
             if(ans == "y"):
                 try:
                     m.inverse().printM()
                 except AttributeError:
-                    print("No inverse possible.")
+                    print("Not possible, matrix not square or has a determinant of 0.")
         else:
             try:
                 m.inverse().printM()
             except AttributeError:
-                    print("No inverse possible.")
+                    print("Not possible, matrix not square or has a determinant of 0.")
         
     elif(cmd == "eigenvalues"):
         print("The real eigenvalues of m are ")
-        print(m.eigenVals())
+        if(m.numRows == m.numCols and m.numRows >= 7):
+            print("WARNING: program may take approximately " + str(0.0019 * factorial(m.numRows)) + " seconds to run.")
+            ans = input("Do you want to continune? (y/n) ")
+            if(ans == "y"):
+                print(m.eigenVals())
+        else:
+            print(m.eigenVals())
  
     elif(cmd == "times"):
         while(True):
@@ -108,7 +121,7 @@ while(True):
                     print("Matrices not compatible, " + m.times(n))
                 break
             if(cmd2 == "scalar"):
-                x = int(input("Input scalar (must be a real number) "))
+                x = float(input("Input scalar (must be a real number) "))
                 m.times(x).printM()
                 break
             else:
